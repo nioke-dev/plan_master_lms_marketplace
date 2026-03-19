@@ -89,9 +89,113 @@ Responsibility: Handle payment processing, transaction records, invoice generati
 
 # Module Dependencies
 
-Dependencies between modules will be documented after the modules are defined.
+### Authentication Module
+depends_on: []
+used_by:
+- User & Role Management
+- Training Management
+- Course Marketplace
+- Learning Delivery
+- Assignment Management
+- Certification
+- Survey & Evaluation
+- Payment
+- Helpdesk & Ticketing
 
-This section will act as the architectural map of the system.
+---
+
+### User & Role Management Module
+depends_on:
+- Authentication
+used_by:
+- Training Management
+- Course Marketplace
+- Learning Delivery
+- Assignment Management
+- Certification
+- Survey & Evaluation
+- Helpdesk & Ticketing
+
+---
+
+### Training Management Module
+depends_on:
+- Authentication
+- User & Role Management
+used_by:
+- Learning Delivery
+- Course Marketplace
+- Certification
+- Survey & Evaluation
+
+---
+
+### Course Marketplace Module
+depends_on:
+- Authentication
+- User & Role Management
+- Training Management
+used_by:
+- Payment
+- Learning Delivery
+
+---
+
+### Learning Delivery Module
+depends_on:
+- Authentication
+- User & Role Management
+- Training Management
+- Course Marketplace
+used_by:
+- Assignment Management
+- Certification
+- Survey & Evaluation
+
+---
+
+### Assignment Management Module
+depends_on:
+- Authentication
+- User & Role Management
+- Learning Delivery
+used_by:
+- Certification
+
+---
+
+### Certification Module
+depends_on:
+- User & Role Management
+- Learning Delivery
+- Assignment Management
+used_by: []
+
+---
+
+### Survey & Evaluation Module
+depends_on:
+- Authentication
+- User & Role Management
+- Training Management
+- Learning Delivery
+used_by: []
+
+---
+
+### Helpdesk & Ticketing Module
+depends_on:
+- Authentication
+- User & Role Management
+used_by: []
+
+---
+
+### Payment Module
+depends_on:
+- Authentication
+- Course Marketplace
+used_by: []
 
 ---
 
