@@ -39,6 +39,8 @@ The system involves several main actors:
 
 # Core Modules
 
+## Core Business Modules
+
 ### 1. Authentication Module
 Handles user authentication, authorization, and session management across all actor types.
 Responsibility: Manage login, registration, password recovery, and token-based access control.
@@ -63,6 +65,8 @@ Responsibility: Manage course content presentation, learning sessions, progress 
 Manages the creation, distribution, submission, and grading of assignments within courses.
 Responsibility: Handle assignment lifecycle including creation by SME, submission by participants, and grading workflows.
 
+## Supporting Modules
+
 ### 7. Certification Module
 Issues and manages certificates upon successful course or program completion.
 Responsibility: Generate certificates, validate completion criteria, and maintain certification records.
@@ -71,13 +75,15 @@ Responsibility: Generate certificates, validate completion criteria, and maintai
 Collects feedback and evaluation data from participants and stakeholders after training delivery.
 Responsibility: Manage survey creation, distribution, response collection, and evaluation reporting.
 
-### 9. Payment Module
-Processes transactions for public course purchases on the marketplace.
-Responsibility: Handle payment processing, transaction records, invoice generation, and payment status tracking.
-
-### 10. Helpdesk & Ticketing Module
+### 9. Helpdesk & Ticketing Module
 Provides a support channel for users to submit and track issues or inquiries.
 Responsibility: Manage ticket creation, assignment, status tracking, and resolution workflows.
+
+## External / Integration Modules
+
+### 10. Payment Module
+Processes transactions for public course purchases on the marketplace.
+Responsibility: Handle payment processing, transaction records, invoice generation, and payment status tracking.
 
 ---
 
