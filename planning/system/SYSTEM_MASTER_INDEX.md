@@ -98,8 +98,6 @@ used_by:
 - Learning Delivery
 - Assignment Management
 - Certification
-- Survey & Evaluation
-- Payment
 - Helpdesk & Ticketing
 
 ---
@@ -124,7 +122,6 @@ depends_on:
 - User & Role Management
 used_by:
 - Learning Delivery
-- Course Marketplace
 - Certification
 - Survey & Evaluation
 
@@ -134,7 +131,6 @@ used_by:
 depends_on:
 - Authentication
 - User & Role Management
-- Training Management
 used_by:
 - Payment
 - Learning Delivery
@@ -175,10 +171,8 @@ used_by: []
 
 ### Survey & Evaluation Module
 depends_on:
-- Authentication
-- User & Role Management
-- Training Management
 - Learning Delivery
+- User & Role Management
 used_by: []
 
 ---
@@ -193,7 +187,6 @@ used_by: []
 
 ### Payment Module
 depends_on:
-- Authentication
 - Course Marketplace
 used_by: []
 
