@@ -72,6 +72,33 @@ The Authentication Module handles user identity verification, session management
 
 ---
 
+## Data Entities
+
+### 1. User
+- id
+- name
+- email
+- password
+- role_id
+- created_at
+
+---
+
+### 2. Role
+- id
+- role_name
+- description
+
+---
+
+### 3. Password Reset Token
+- id
+- user_id
+- token
+- expired_at
+
+---
+
 ## Dependencies
 
 depends_on: []
