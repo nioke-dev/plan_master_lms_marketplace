@@ -39,21 +39,45 @@ The system involves several main actors:
 
 # Core Modules
 
-Core modules will be defined in separate planning documents.
+### 1. Authentication Module
+Handles user authentication, authorization, and session management across all actor types.
+Responsibility: Manage login, registration, password recovery, and token-based access control.
 
-Examples of modules that may exist include:
+### 2. User & Role Management Module
+Manages user profiles, role definitions, and role-based access permissions for the entire platform.
+Responsibility: Define and enforce actor roles (Learning Coordinator, SME, Admin, Participants, etc.) and their access scopes.
 
-- Authentication
-- Training Management
-- Course Marketplace
-- Learning Delivery
-- Assignment Management
-- Certification System
-- Survey & Evaluation
-- Payment System
-- Helpdesk Ticketing
+### 3. Training Management Module
+Supports the end-to-end lifecycle of enterprise training programs from needs submission to scheduling.
+Responsibility: Manage training needs requests, program planning, scheduling, and training program records.
 
-These modules will be defined gradually during planning.
+### 4. Course Marketplace Module
+Provides a public-facing storefront for browsing, previewing, and purchasing training courses.
+Responsibility: Manage course catalog listings, search, filtering, and course detail pages for public and internal users.
+
+### 5. Learning Delivery Module
+Handles the delivery of learning content to participants, supporting blended learning formats.
+Responsibility: Manage course content presentation, learning sessions, progress tracking, and attendance recording.
+
+### 6. Assignment Management Module
+Manages the creation, distribution, submission, and grading of assignments within courses.
+Responsibility: Handle assignment lifecycle including creation by SME, submission by participants, and grading workflows.
+
+### 7. Certification Module
+Issues and manages certificates upon successful course or program completion.
+Responsibility: Generate certificates, validate completion criteria, and maintain certification records.
+
+### 8. Survey & Evaluation Module
+Collects feedback and evaluation data from participants and stakeholders after training delivery.
+Responsibility: Manage survey creation, distribution, response collection, and evaluation reporting.
+
+### 9. Payment Module
+Processes transactions for public course purchases on the marketplace.
+Responsibility: Handle payment processing, transaction records, invoice generation, and payment status tracking.
+
+### 10. Helpdesk & Ticketing Module
+Provides a support channel for users to submit and track issues or inquiries.
+Responsibility: Manage ticket creation, assignment, status tracking, and resolution workflows.
 
 ---
 
