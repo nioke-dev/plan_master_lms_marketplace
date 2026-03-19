@@ -44,6 +44,34 @@ The Authentication Module handles user identity verification, session management
 
 ---
 
+## Authentication Flow
+
+### 1. User Registration Flow
+- User opens the registration page.
+- User fills in the registration form (name, email, password, role selection).
+- System validates input (required fields, email format, password strength).
+- System stores user data with hashed password.
+- System redirects user to the login page.
+
+### 2. Login Flow
+- User enters credentials (email and password).
+- System validates credentials against stored records.
+- System creates a session/token upon successful validation.
+- System redirects user to the appropriate dashboard based on role.
+
+### 3. Logout Flow
+- User clicks the logout button.
+- System destroys the active session/token.
+- User is redirected to the login page.
+
+### 4. Password Reset Flow
+- User requests a password reset by providing their registered email.
+- System sends a password reset link to the user's email.
+- User opens the reset link and sets a new password.
+- System validates and updates the password.
+
+---
+
 ## Dependencies
 
 depends_on: []
