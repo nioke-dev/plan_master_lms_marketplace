@@ -99,6 +99,16 @@ The Authentication Module handles user identity verification, session management
 
 ---
 
+## Entity Relationships
+
+- One Role can have many Users.
+- One User belongs to one Role.
+
+- One User can have many Password Reset Tokens.
+- One Password Reset Token belongs to one User.
+
+---
+
 ## Dependencies
 
 depends_on: []
