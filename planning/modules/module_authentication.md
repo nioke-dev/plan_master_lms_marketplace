@@ -99,6 +99,25 @@ The Authentication Module handles user identity verification, session management
 
 ---
 
+## Business Rules
+
+### User Rules
+- Email must be unique.
+- Password must meet minimum security requirements (e.g., minimum 8 characters, mix of letters and numbers).
+- Role must be assigned at registration.
+
+### Authentication Rules
+- User cannot login with invalid credentials.
+- User session must expire after a certain period of inactivity.
+- Multiple failed login attempts should trigger temporary lockout.
+
+### Password Reset Rules
+- Reset token must have an expiration time.
+- Token can only be used once.
+- Only a registered email can request a password reset.
+
+---
+
 ## Entity Relationships
 
 - One Role can have many Users.
