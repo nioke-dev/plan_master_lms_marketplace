@@ -128,6 +128,30 @@ The Authentication Module handles user identity verification, session management
 
 ---
 
+## Laravel Implementation Mapping
+
+### Models
+- User (Eloquent Model)
+- Role (Eloquent Model)
+- PasswordResetToken (Eloquent Model)
+
+### Controllers
+- AuthController (login, logout)
+- RegisterController (register)
+- PasswordResetController (reset password)
+
+### Middleware
+- auth (protect routes)
+- role (role-based access control)
+
+### Routes
+- /login
+- /register
+- /logout
+- /password/reset
+
+---
+
 ## Dependencies
 
 depends_on: []
