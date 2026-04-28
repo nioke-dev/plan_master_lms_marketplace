@@ -1,165 +1,73 @@
 # Authentication Module
 
-## Overview
+## Layer 1: Overview & Aktor
+Modul Autentikasi menangani verifikasi identitas, manajemen sesi, dan kontrol akses. Mengingat kompleksitas *Enterprise* dari Semen Indonesia Group (SIG), sistem autentikasi memegang teguh prinsip keamanan dan pemisahan logika bisnis. Sistem dibagi menjadi **Dua Portal Terpisah** untuk memisahkan lalu lintas peserta didik (Publik & Karyawan) dari area administratif yang sangat teknis.
 
-The Authentication Module handles user identity verification, session management, and access control across the LMS Marketplace platform. It serves as the foundational security layer that all other modules depend on.
-
----
-
-## Actors
-
-- **Public User** — Registers and logs in to access the public course marketplace.
-- **Employee** — Logs in to access internal training programs and learning activities.
-- **Admin** — Logs in to manage system configuration, users, and platform operations.
+**Aktor Terlibat:**
+- Portal Learner (Peserta): `public`, `employee`
+- Portal Manajemen (Teknis): `learning_administrator`, `learning_coordinator`, `admin_coordinator`, `sme`, `helpdesk_admin`
 
 ---
 
-## Features
+## Layer 2: Fitur Utama
+**Portal Learner (Public & Employee):**
+1. **Identifier-First Login:** Autentikasi menggunakan metode 1 kolom input awal (hanya menanyakan Email).
+2. **Automasi Setup Karyawan Baru:** Pengiriman instan "Link Setup Password" via email apabila data Karyawan kosong/belum memiliki *password* dari HR.
+3. Login via Google SSO (Oauth) dengan "Polisi Tidur" untuk mencegah Karyawan Gaptek salah pencet.
+4. Register (Eksklusif hanya untuk Publik).
+5. Session Persistence (Kembali ke Landing Page promo tanpa putus sesi).
 
-- Register (new account creation)
-- Login (credential-based authentication)
-- Logout (session termination)
-- Password Reset (self-service recovery)
+**Portal Manajemen (Technical Roles):**
+1. Login Backoffice Tersembunyi (Berbasis Email & Password kaku, UI statis tanpa Register/Google).
 
----
-
-## Functional Requirements
-
-- User can register a new account with required profile information.
-- User can login using valid credentials (email and password).
-- System validates credentials against stored records.
-- System creates a session or token upon successful authentication.
-- User can logout, which invalidates the active session/token.
-- User can request a password reset via registered email.
-- System enforces role-based redirection after login based on user type.
+**Global Tools:**
+1. Logout (Pemusnahan Session).
+2. Reset Password Khusus Email.
 
 ---
 
-## Non-Functional Notes
+## Layer 3: Fungsionalitas & Logika Bisnis (CRUD & Edge Cases)
 
-- **Security**: Passwords must be hashed before storage (e.g., bcrypt).
-- **Session Handling**: Token-based session management (e.g., JWT) with expiration policy.
-- **Access Control**: All protected routes must verify authentication status before granting access.
-- **Rate Limiting**: Login attempts should be rate-limited to prevent brute-force attacks.
+### A. Logika Portal Learner (Front-End) - Identifier First
+- **Top Bar Navigasi (Landing Page):** 
+  - Saat mode *guest*, tombol pojok kanan atas bertuliskan **"Masuk / Learning Center"**. 
+  - Setelah berhasil masuk, tombol "Masuk" berubah menjadi **"Profil / Dasbor [Nama User]"**. Session menempel, klik tombol ini akan kembali melempar ke Dashboard tanpa perlu login diulang.
 
----
+- **Alur Login 1 Kolom (Identifier First):**
+  - **Skenario Ideal:** Layar Login HANYA memunculkan 1 kolom bertuliskan: *"Email ID Anda"*. Tidak ada kotak pilihan peran, tidak ada kolom password.
+  - **Langkah 1:** User (Misal: Karyawan) mengetik `budi@sig.id` lalu klik 'Lanjut'.
+  - **Langkah 2 (Pengecekan):** Sistem mencari email di DB.
+    - *Kasus A (Karyawan Belum Setup):* Sistem mendeteksi bahwa field `password` si Budi itu `null` (hasil import HR kosongan). Maka kolom password **tidak akan dimunculkan**. Sistem justru mengirim "Link Setup Akun Baru" ke email Budi via API Fortify, lalu layar UI berubah jadi pesan sukses: *"Silakan cek masuk email kantor Anda untuk membuat Password perdana."*
+    - *Kasus B (Pengguna Normal/Sudah Setup):* Sistem mendeteksi `password` user sudah ada isinya. Barulah di langkah ini secara *seamless* (tanpa reload), kolom "Password" muncul untuk diisi normal.
+    - *Kasus C (Technical Role Salah Portal):* Jika email yang dimasukkan adalah email dari role teknis (Admin Coordinator, SME, Learning Administrator, dll), maka sistem **otomatis memblokir** dan memunculkan *alert*: *"Akun Anda adalah akun Manajemen. Harap login melalui portal eksklusif (Back-Office)."*
+    - *Kasus D (Publik Tidak Dikenal):* Budi mengetik `budi@gmail.com` dan belum ada di DB. Sistem menolak dan memunculkan notifikasi merah yang menunjuk ke menu "Register di Sini".
 
-## Authentication Flow
+- **Alur "Login With Google" (SSO & Jaring Pengaman Gaptek):**
+  - Fitur *"Login With Google"* ditempatkan di bawah form email.
+  - **Skenario Publik:** Jika Publik sejati mengklik ini, sistem membuatkan akun Public Database dengan *password hash* acak *on the fly*, lalu langsung meloloskannya ke _Dashboard_.
+  - **Skenario Karyawan Valid (`@sig.id`):** Jika dia masuk via Google SSO, sistem mengecek *Database*. Jika status `password` miliknya masih `NULL`, maka **Akses SSO ditahan sementara**. Sistem akan mengiriminya '*Email Setup Password*' dan menyuruhnya membuat *password* internal dulu demi kepatuhan keamanan, sebelum dia bisa mulai belajar.
+  - **Skenario Jaring Pengaman:** Jika Karyawan Gaptek mengklik logo Google tapi ponselnya tertaut pada `ekagaptek@gmail.com` pribadinya, Server kita membunyikan alarm: *"Tunggu dulu! Akun email ini tidak terdeteksi sebagai karyawan kantor. Akun Anda akan kami jadikan warga Publik. Jika Anda Karyawan SIG yang berniat ikut kelas penugasan, silakan BATALKAN dan kembali isi menggunakan Email Perusahaan Anda"*.
 
-### 1. User Registration Flow
-- User opens the registration page.
-- User fills in the registration form (name, email, password, role selection).
-- System validates input (required fields, email format, password strength).
-- System stores user data with hashed password.
-- System redirects user to the login page.
-
-### 2. Login Flow
-- User enters credentials (email and password).
-- System validates credentials against stored records.
-- System creates a session/token upon successful validation.
-- System redirects user to the appropriate dashboard based on role.
-
-### 3. Logout Flow
-- User clicks the logout button.
-- System destroys the active session/token.
-- User is redirected to the login page.
-
-### 4. Password Reset Flow
-- User requests a password reset by providing their registered email.
-- System sends a password reset link to the user's email.
-- User opens the reset link and sets a new password.
-- System validates and updates the password.
+### B. Logika Portal Manajemen (Technical Back-Office)
+- **Pemisahan Jalur Subdomain:** Menggunakan arsitektur keamanan *Enterprise*, yaitu isolasi melalui **Subdomain** (Misal: `admin.lms.sig.com` atau `management.lms.sig.com`), bukan *subfolder/routing* (bukan `/admin/login`). Hal ini mencegah pencurian sesi *cookie* dan memungkinkan pemblokiran IP Intranet via *Firewall* SIG.
+- **Keamanan Statis (Kaku):** Portal ini tidak mentolerir SSO atau Register mandiri. Form meminta Email + Password sejak detik pertama. Semua data penggunanya murni diinjeksi (*seeded*) oleh IT/Pusat.
+- **Role Middleware Protection:** *User* dengan peran `public` atau `employee` yang iseng menebak *password* di portal belakang ini akan otomatis diblokir dengan *error 403 (Unauthorized)*.
 
 ---
 
-## Data Entities
+## Layer 4: Skenario Testing Jaminan Keamanan (UAT)
 
-### 1. User
-- id
-- name
-- email
-- password
-- role_id
-- created_at
+Skenario-skenario ekstrem (*Edge Cases*) yang harus sukses diuji sebelum Modul ini dinyatakan lulus:
 
----
-
-### 2. Role
-- id
-- role_name
-- description
-
----
-
-### 3. Password Reset Token
-- id
-- user_id
-- token
-- expired_at
-
----
-
-## Business Rules
-
-### User Rules
-- Email must be unique.
-- Password must meet minimum security requirements (e.g., minimum 8 characters, mix of letters and numbers).
-- Role must be assigned at registration.
-
-### Authentication Rules
-- User cannot login with invalid credentials.
-- User session must expire after a certain period of inactivity.
-- Multiple failed login attempts should trigger temporary lockout.
-
-### Password Reset Rules
-- Reset token must have an expiration time.
-- Token can only be used once.
-- Only a registered email can request a password reset.
-
----
-
-## Entity Relationships
-
-- One Role can have many Users.
-- One User belongs to one Role.
-
-- One User can have many Password Reset Tokens.
-- One Password Reset Token belongs to one User.
-
----
-
-## Laravel Implementation Mapping
-
-### Models
-- User (Eloquent Model)
-- Role (Eloquent Model)
-- PasswordResetToken (Eloquent Model)
-
-### Controllers
-- AuthController (login, logout)
-- RegisterController (register)
-- PasswordResetController (reset password)
-
-### Middleware
-- auth (protect routes)
-- role (role-based access control)
-
-### Routes
-- /login
-- /register
-- /logout
-- /password/reset
-
----
-
-## Dependencies
-
-depends_on: []
-used_by:
-- User & Role Management
-- Training Management
-- Course Marketplace
-- Learning Delivery
-- Assignment Management
-- Certification
-- Helpdesk & Ticketing
+1. **Uji Coba Password Kosong (First-Time Login):**
+   - Aktor menginput email karyawan yang *password*-nya *NULL* di form.
+   - *Ekspektasi:* Form *password* tidak muncul, sistem memanggil *API Mailer* dan berhasil mengirim tautan *Setup Password* ke tujuan.
+2. **Uji Coba Celah SSO Google (Pemaksaan Setup):**
+   - Aktor *login Google* menggunakan `@sig.id` yang *password*-nya di *database* masih *NULL*.
+   - *Ekspektasi:* Sistem mencekal (*intercept*) kemudahan SSO dan memaksa pengguna mengonfirmasi tautan keamanan di *email*-nya sebelum divalidasi sistem.
+3. **Uji Coba Pencampuran Identitas (Karyawan Ikut Kelas Publik):**
+   - Seorang karyawan *logout* akun komersilnya, lalu memasukkan email `@gmail.com` miliknya di layar utama.
+   - *Ekspektasi:* Sistem tidak membentrokkan data. Sistem menganggapnya murni sebagai peran `public`.
+4. **Uji Coba Penetrasi Subdomain Back-Office:**
+   - Aktor mengetik URL `management.lms.sig.com` dan *login* menggunakan akun yang ber-role Publik/Karyawan Normal.
+   - *Ekspektasi:* *Middleware* seketika menendang pengguna tersebut dengan *error Forbidden* (Akses Ditolak).
